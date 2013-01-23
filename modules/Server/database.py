@@ -24,8 +24,9 @@ class Database(object):
         with open(db_file) as f:
             fortune = ''
             for line in f:
-                if line == '%':
+                if line[0] == '%':
                     self.fortunes.append(fortune)
+                    fortune = ''
                 else:
                     fortune = ''.join([fortune, line])
 
