@@ -11,6 +11,7 @@
 
 import random
 
+
 class Database(object):
     """Class containing a database implementation."""
 
@@ -18,14 +19,22 @@ class Database(object):
         self.db_file = db_file
         self.rand = random.Random()
         self.rand.seed()
-        pass
-        
+        self.fortunes = []
+
+        with open(db_file) as f:
+            fortune = ''
+            for line in f:
+                if line == '%':
+                    self.fortunes.append(fortune)
+                else:
+                    fortune = ''.join([fortune, line])
+
     def read(self):
         """Read a random location in the database."""
-        #
-        # Your code here.
-        #
-        pass
+        try:
+            return self.rand.choice(self.fortunes)
+        except IndexError:
+            return ''
 
     def write(self, fortune):
         """Write a new fortune to the database."""
