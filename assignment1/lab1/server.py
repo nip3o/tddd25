@@ -27,7 +27,7 @@ from Server.Lock.readWriteLock import ReadWriteLock
 # ------------------------------------------------------------------------------
 
 description = """
-    Server for a fortune database. It allows clients to access the database in 
+    Server for a fortune database. It allows clients to access the database in
 parallel.
 """
 arg_parser = OptionParser(description = description)
@@ -43,12 +43,16 @@ if opts.port is None:
         rand = random.Random()
         rand.seed()
         port = rand.randint(1, 10000) + 40000
-else:   port = opts.port
+else:
+    port = opts.port
 
-if opts.file is None:   db_file = "dbs/fortune.db"
-else:                   db_file = opts.file
+if opts.file is None:
+    db_file = "dbs/fortune.db"
+else:
+    db_file = opts.file
 
 server_address = ("", port)
+
 
 # ------------------------------------------------------------------------------
 # Auxiliary classes
@@ -74,6 +78,7 @@ class Server(object):
         # Your code here.
         #
         pass
+
 
 class Request(threading.Thread):
     """ Class for handling incoming requests.
@@ -104,10 +109,25 @@ class Request(threading.Thread):
                     { "error" : {   "name" : error_class_name,
                                     "args" : error_args         } }
         """
-        #
-        # Your code here.
-        #
-        pass
+        try:
+            request = json.loads(request)
+            method = request.get('method')
+
+            if method == 'read':
+                result = self.db_server.read()
+
+            elif method == 'write':
+                fortune = request.get('params')
+                result = self.db_server.write(fortune)
+
+            else:
+                raise Exception
+
+            return json.dumps({'result': result})
+
+        except Exception, e:
+            return json.dumps({'error': {'name': 'ComunicationError',
+                                         'args': e}})
 
     def run(self):
         try:
@@ -123,11 +143,13 @@ class Request(threading.Thread):
             # Send the result.
             worker.write(result + '\n')
             worker.flush()
+
         except Exception, e:
             # Catch all errors in order to prevent the object from crashing
             # due to bad connections coming from outside.
             print "The connection to the caller has died:"
             print "\t{0}".format(e)
+
         finally:
             self.conn.shutdown(socket.SHUT_RDWR)
             self.conn.close()
