@@ -18,11 +18,8 @@ class Database(object):
         self.db_file = db_file
         self.rand = random.Random()
         self.rand.seed()
-        #
-        # Your code here.
-        #
         pass
-
+        
     def read(self):
         """Read a random location in the database."""
         #
@@ -32,7 +29,7 @@ class Database(object):
 
     def write(self, fortune):
         """Write a new fortune to the database."""
-        #
-        # Your code here.
-        #
+        with open(self.db_file, 'a') as f:
+            f.write(fortune)
+            f.write('\n%\n')
         pass
