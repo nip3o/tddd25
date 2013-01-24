@@ -24,12 +24,12 @@ usage = """Usage: client.py [options] server_address:server_port"""
 description = """
     Client for a fortune database. It reads a random fortune from the database.
 """
-arg_parser = OptionParser(usage = usage, description = description)
-arg_parser.add_option("-w", "--write", metavar = "FORTUNE", dest = "fortune",
-    help = "Write a new fortune to the database.")
+arg_parser = OptionParser(usage=usage, description=description)
+arg_parser.add_option("-w", "--write", metavar="FORTUNE", dest="fortune",
+    help="Write a new fortune to the database.")
 arg_parser.add_option("-i", "--interactive",
-    action = "store_true", dest = "interactive", default = False,
-    help = "Interactive session with the fortune database.")
+    action="store_true", dest="interactive", default=False,
+    help="Interactive session with the fortune database.")
 opts, args = arg_parser.parse_args()
 
 server_address = None
@@ -46,8 +46,10 @@ else:
 # Auxiliary classes
 # ------------------------------------------------------------------------------
 
+
 class ComunicationError(Exception):
     pass
+
 
 class DatabaseProxy(object):
     """Class that simulates the behavior of the database class."""
