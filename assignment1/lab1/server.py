@@ -64,16 +64,15 @@ class Server(object):
     # Public methods
 
     def read(self):
-        #
-        # Your code here.
-        #
-        pass
+        self.rwlock.read_acquire()
+        result = self.db.read()
+        self.rwlock.read_release()
+        return result
 
     def write(self, fortune):
-        #
-        # Your code here.
-        #
-        pass
+        self.rwlock.write_acquire()
+        self.db.write(fortune)
+        self.rwlock.write_release()
 
 class Request(threading.Thread):
     """ Class for handling incoming requests.

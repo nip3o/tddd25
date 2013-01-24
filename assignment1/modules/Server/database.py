@@ -42,4 +42,3 @@ class Database(object):
         with open(self.db_file, 'a') as f:
             f.write(fortune)
             f.write('\n%\n')
-        pass

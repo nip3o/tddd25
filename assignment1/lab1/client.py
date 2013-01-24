@@ -58,17 +58,56 @@ class DatabaseProxy(object):
     # Public methods
 
     def read(self):
-        #
-        # Your code here.
-        #
-        pass
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.connect(self.address[0], self.address[1])
+
+            read_command = json.dumps({'method': 'read', 'params': ''})
+            s.send(read_command)
+
+            prev_buf = ''
+            while True:
+                buf = s.recv(4096)
+                if buf[-1] == '}'
+                    break;
+                elif buf == last_buf:
+                    raise RuntimeError("socket connection broken")            
+
+            result = json.loads(buf).get('result')
+
+            if not result:
+                result = json.loads(buf).get('error')
+
+            return result
+        except socket.error as e:
+            print e
 
     def write(self, fortune):
-        #
-        # Your code here.
-        #
-        pass
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.connect(self.address[0], self.address[1])
 
+            write_command = json.dumps({'method': 'write', 'params': fortune})
+            total_sent = 0
+            while total_sent < len(write_command):
+                sent = s.send(write_command[total_sent:])
+
+                if sent == 0:
+                    raise RuntimeError("socket connection broken")
+
+                total_sent += sent
+
+            buf = s.recv(4096)
+
+            result = json.loads(buf).get('error')
+
+            if result:
+                print result
+            else
+                print 'Write successful'
+
+        except socket.error as e:
+            print e
 # ------------------------------------------------------------------------------
 # The main program
 # ------------------------------------------------------------------------------
