@@ -62,34 +62,41 @@ class DatabaseProxy(object):
     def read(self):
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.connect(self.address[0], self.address[1])
+            s.connect((self.address[0], self.address[1]))
 
-            read_command = json.dumps({'method': 'read', 'params': ''})
+            read_command = ''.join((json.dumps({'method': 'read', 'params': ''}), '\n'))
             s.send(read_command)
 
-            prev_buf = ''
+            buf = ''
+            part = ''
             while True:
-                buf = s.recv(4096)
-                if buf[-1] == '}'
-                    break;
-                elif buf == last_buf:
-                    raise RuntimeError("socket connection broken")            
+                part = s.recv(4096)
+
+                if not part:
+                    break
+
+                buf = ''.join((buf, part))
+                part = ''
 
             result = json.loads(buf).get('result')
 
             if not result:
                 result = json.loads(buf).get('error')
 
-            return result
         except socket.error as e:
             print e
+
+        finally:
+            s.close()
+
+        return result
 
     def write(self, fortune):
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.connect(self.address[0], self.address[1])
+            s.connect((self.address[0], self.address[1]))
 
-            write_command = json.dumps({'method': 'write', 'params': fortune})
+            write_command = ''.join((json.dumps({'method': 'write', 'params': fortune}), '\n'))
             total_sent = 0
             while total_sent < len(write_command):
                 sent = s.send(write_command[total_sent:])
@@ -105,11 +112,14 @@ class DatabaseProxy(object):
 
             if result:
                 print result
-            else
+            else:
                 print 'Write successful'
 
         except socket.error as e:
             print e
+
+        finally:
+            s.close()
 # ------------------------------------------------------------------------------
 # The main program
 # ------------------------------------------------------------------------------

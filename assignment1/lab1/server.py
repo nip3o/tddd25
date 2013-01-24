@@ -132,13 +132,10 @@ class Request(threading.Thread):
         try:
             # Threat the socket as a file stream.
             worker = self.conn.makefile()
-
             # Read the request in a serialized form (JSON).
             request = worker.readline()
-
             # Process the request.
             result = self.process_request(request)
-
             # Send the result.
             worker.write(result + '\n')
             worker.flush()
