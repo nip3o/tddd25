@@ -94,15 +94,16 @@ class Skeleton(threading.Thread):
         self.address = address
         self.owner = owner
         self.daemon = True
-        server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server.bind(address)
-        server.listen(1)
+
+        self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.server.bind(address)
+        self.server.listen(1)
         pass
 
     def run(self):
         while True:
             try:
-                conn, addr = server.accept()
+                conn, addr = self.server.accept()
                 req = Request(self.owner, conn, addr)
                 print "Serving a request from {0}".format(addr)
                 req.start()
