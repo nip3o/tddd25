@@ -28,8 +28,10 @@ import json
             remote objects should extend this class.
 """
 
+
 class ComunicationError(Exception):
     pass
+
 
 class Stub(object):
     """ Stub for generic objects distributed over the network.
@@ -52,6 +54,7 @@ class Stub(object):
             return self._rmi(attr, *args)
         return rmi_call
 
+
 class Request(threading.Thread):
     """Run the incoming requests on the owner object of the skeleton."""
 
@@ -67,6 +70,7 @@ class Request(threading.Thread):
         # Your code here.
         #
         pass
+
 
 class Skeleton(threading.Thread):
     """ Skeleton class for a generic owner.
@@ -90,6 +94,7 @@ class Skeleton(threading.Thread):
         # Your code here.
         #
         pass
+
 
 class Peer:
     """ Peer class, this should be extended in order to build objects that
