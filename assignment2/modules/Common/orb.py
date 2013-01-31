@@ -43,10 +43,20 @@ class Stub(object):
         self.address = tuple(address)
 
     def _rmi(self, method, *args):
-        #
-        # Your code here.
-        #
-        pass
+        data = ''.join((json.dumps({'method': method, 'params': args}), '\n'))
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect(self.address)
+
+        # Threat the socket as a file stream.
+        worker = s.makefile()
+        # Send the result.
+        worker.write(data)
+        worker.flush()
+
+        # Read the request in a serialized form (JSON).
+        response = json.loads(worker.readline())
+
+        return response.get('result')
 
     def __getattr__(self, attr):
         """Forward call to name over the network at the given address."""
