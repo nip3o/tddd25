@@ -76,10 +76,22 @@ class Request(threading.Thread):
         self.daemon = True
 
     def run(self):
-        #
-        # Your code here.
-        #
-        pass
+        worker = self.conn.makefile()
+        request = json.loads(worker.readline())
+
+        try:
+            fn = getattr(self.owner, request['method'])
+            result = fn(*request['params'])
+
+            worker.write(''.join((json.dumps({'result': result}), '\n')))
+
+        except AttributeError, e:
+            response = json.dumps({'error': {'name': 'ComunicationError',
+                                             'args': e}})
+            worker.write(''.join(response, '\n'))
+
+        finally:
+            self.conn.close()
 
 
 class Skeleton(threading.Thread):
