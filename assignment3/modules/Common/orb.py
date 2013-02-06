@@ -56,6 +56,10 @@ class Stub(object):
         # Read the request in a serialized form (JSON).
         response = json.loads(worker.readline())
 
+        error = response.get('error')
+        if error:
+            raise Exception(error.get('args'))
+
         return response.get('result')
 
     def __getattr__(self, attr):
