@@ -47,7 +47,7 @@ class Stub(object):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect(self.address)
 
-        # Threat the socket as a file stream.
+        # Treat the socket as a file stream.
         worker = s.makefile()
         # Send the result.
         worker.write(data)

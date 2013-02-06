@@ -33,26 +33,30 @@ from Server.peerList import PeerList
 # ------------------------------------------------------------------------------
 
 arg_parser = OptionParser()
-arg_parser.add_option("-p", "--port", metavar = "PORT", dest = "port",
-    help = "Set the port to listen to. Must be in the range 40001 .. 50000."
+arg_parser.add_option("-p", "--port", metavar="PORT", dest="port",
+    help="Set the port to listen to. Must be in the range 40001 .. 50000."
            "The default value is chosen at random.")
-arg_parser.add_option("-t", "--type", metavar = "TYPE", dest = "type",
-    help = "Set the client's type.")
+arg_parser.add_option("-t", "--type", metavar="TYPE", dest="type",
+    help="Set the client's type.")
 opts, args = arg_parser.parse_args()
 
 if opts.port is None:
         rand = random.Random()
         rand.seed()
         local_port = rand.randint(1, 10000) + 40000
-else:   local_port = opts.port
+else:   
+    local_port = opts.port
 
-if opts.type is None:   client_type = object_type
-else:                   client_type = opts.type
+if opts.type is None:
+    client_type = object_type
+else:
+    client_type = opts.type
 assert client_type != "object", "Change the object type to something unique!"
 
 # ------------------------------------------------------------------------------
 # Auxiliary classes
 # ------------------------------------------------------------------------------
+
 
 class Client(orb.Peer):
     """Chat client class."""
@@ -99,6 +103,7 @@ class Client(orb.Peer):
 # Initialize the client object.
 local_address = (socket.gethostname(), local_port)
 p = Client(local_address, name_service_address, client_type)
+
 
 def menu():
     print (
