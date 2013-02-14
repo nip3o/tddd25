@@ -12,6 +12,7 @@
 import threading
 from Common import orb
 
+
 class PeerList(object):
     """Class that builds a list of objects of the same type as this one."""
 
