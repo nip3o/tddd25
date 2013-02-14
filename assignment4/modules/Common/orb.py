@@ -28,8 +28,10 @@ import json
             remote objects should extend this class.
 """
 
+
 class ComunicationError(Exception):
     pass
+
 
 class Stub(object):
     """ Stub for generic objects distributed over the network.
@@ -41,16 +43,31 @@ class Stub(object):
         self.address = tuple(address)
 
     def _rmi(self, method, *args):
-        #
-        # Your code here.
-        #
-        pass
+        data = ''.join((json.dumps({'method': method, 'params': args}), '\n'))
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect(self.address)
+
+        # Treat the socket as a file stream.
+        worker = s.makefile()
+        # Send the result.
+        worker.write(data)
+        worker.flush()
+
+        # Read the request in a serialized form (JSON).
+        response = json.loads(worker.readline())
+
+        error = response.get('error')
+        if error:
+            raise Exception(error.get('args'))
+
+        return response.get('result')
 
     def __getattr__(self, attr):
         """Forward call to name over the network at the given address."""
         def rmi_call(*args):
             return self._rmi(attr, *args)
         return rmi_call
+
 
 class Request(threading.Thread):
     """Run the incoming requests on the owner object of the skeleton."""
@@ -63,10 +80,23 @@ class Request(threading.Thread):
         self.daemon = True
 
     def run(self):
-        #
-        # Your code here.
-        #
-        pass
+        worker = self.conn.makefile()
+        request = json.loads(worker.readline())
+
+        try:
+            fn = getattr(self.owner, request['method'])
+            result = fn(*request['params'])
+
+            worker.write(''.join((json.dumps({'result': result}), '\n')))
+
+        except AttributeError, e:
+            response = json.dumps({'error': {'name': 'ComunicationError',
+                                             'args': e}})
+            worker.write(''.join(response, '\n'))
+
+        finally:
+            self.conn.close()
+
 
 class Skeleton(threading.Thread):
     """ Skeleton class for a generic owner.
@@ -80,16 +110,23 @@ class Skeleton(threading.Thread):
         self.address = address
         self.owner = owner
         self.daemon = True
-        #
-        # Your code here.
-        #
+
+        self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.server.bind(address)
+        self.server.listen(1)
         pass
 
     def run(self):
-        #
-        # Your code here.
-        #
+        while True:
+            try:
+                conn, addr = self.server.accept()
+                req = Request(self.owner, conn, addr)
+                print "Serving a request from {0}".format(addr)
+                req.start()
+            except socket.error:
+                continue
         pass
+
 
 class Peer:
     """ Peer class, this should be extended in order to build objects that
