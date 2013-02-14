@@ -46,15 +46,15 @@ class DistributedLock(object):
         """
         self.peer_list.lock.acquire()
         try:
-            if len(self.peer_list) == 0:
+            if len(self.peer_list.peers) == 0:
                 self.state = TOKEN_PRESENT
 
             else:
                 self.state = NO_TOKEN
 
-            for peer in self.peer_list:
-                self.token[peer.id] = 0
-                self.request[peer.id] = 0
+            for peer in self.peer_list.peers:
+                self.token[peer] = 0
+                self.request[peer] = 0
         finally:
             self.peer_list.lock.release()
 
@@ -63,8 +63,8 @@ class DistributedLock(object):
             give it to someone else.
         """
         if self.state in (TOKEN_HELD, TOKEN_PRESENT):
-            peer = self.peer_list.values()[0]
-            peer.obtain_token()
+            pid = self.peer_list.peers.values()[0]
+            self.peer_list.peer(pid).obtain_token()
 
     def register_peer(self, pid):
         """Called when a new peer joins the system."""
@@ -99,8 +99,8 @@ class DistributedLock(object):
 
         try:
             if self.state == NO_TOKEN:
-                for peer in self.peer_list:
-                    peer.request_token(self.time, self.id)
+                for pid in self.peer_list.peers:
+                    self.peer_list.peer(pid).request_token(self.time, self.id)
 
                 self.peer_list.lock.release()
 
@@ -114,15 +114,15 @@ class DistributedLock(object):
 
     def _pass_token(self):
         def do_release():
-            if self.request[peer.id] > self.token:
+            if self.request[pid] > self.token:
                 self.state = NO_TOKEN
-                self.token[peer.id] = self.time
+                self.token[pid] = self.time
                 self.time += 1
 
-        for peer in [p for p in self.peer_list if p.id > self.owner.id]:
+        for pid in [p for p in self.peer_list.peers if p > self.owner.id]:
             do_release()
 
-        for peer in [p for p in self.peer_list if p.id < self.owner.id]:
+        for pid in [p for p in self.peer_list.peers if p < self.owner.id]:
             do_release()
 
     def release(self):
