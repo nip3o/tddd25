@@ -9,6 +9,8 @@
 
 """Class for implementing distributed mutual exclusion."""
 
+import time
+
 NO_TOKEN = 0
 TOKEN_PRESENT = 1
 TOKEN_HELD = 2
@@ -99,6 +101,11 @@ class DistributedLock(object):
             if self.state == NO_TOKEN:
                 for peer in self.peer_list:
                     peer.request_token(self.time, self.id)
+
+                self.peer_list.lock.release()
+
+                while self.state == NO_TOKEN:
+                    time.sleep(0.01)
             else:
                 self.state = TOKEN_HELD
 
@@ -148,9 +155,14 @@ class DistributedLock(object):
     def obtain_token(self, token):
         """Called when some other object is giving us the token."""
         print "Receiving the token..."
+        self.peer_list.lock.acquire()
 
-        self.token = token
-        self.state = TOKEN_PRESENT
+        try:
+            self.token = token
+            self.state = TOKEN_PRESENT
+
+        finally:
+            self.peer_list.lock.release()
 
     def display_status(self):
         self.peer_list.lock.acquire()
