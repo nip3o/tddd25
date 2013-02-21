@@ -49,8 +49,8 @@ class PeerList(object):
         """Unregister this peer from all others in the list."""
         self.lock.acquire()
         try:
-            for peer in self.peers:
-                peer.unregister_peer(self.owner.id)
+            for pid in self.peers:
+                self.peer(pid).unregister_peer(self.owner.id)
         finally:
             self.lock.release()
 

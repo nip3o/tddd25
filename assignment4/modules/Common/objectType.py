@@ -5,4 +5,4 @@
     object_StudentId) so as to avoid conflicts.
 """
 
-object_type = "12345r232sdfg"
+object_type = "ou8gergpg"
