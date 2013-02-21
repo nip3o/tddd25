@@ -12,6 +12,7 @@
 import threading
 from Common import orb
 
+
 class PeerList(object):
     """Class that builds a list of objects of the same type as this one."""
 
@@ -32,12 +33,15 @@ class PeerList(object):
         """
         self.lock.acquire()
         try:
-            #
-            # Your code here.
-            #
-            pass
-        except Exception, e:
-            raise e
+            name_service_peers = self.owner.name_service.require_all(self.owner.type)
+
+            for pid, paddr in name_service_peers:
+                if pid < self.owner.id:
+                    self.register_peer(pid, paddr)
+
+            for _, peer in self.peers.iteritems():
+                peer.register_peer(self.owner.id, self.owner.address)
+
         finally:
             self.lock.release()
 
@@ -45,10 +49,8 @@ class PeerList(object):
         """Unregister this peer from all others in the list."""
         self.lock.acquire()
         try:
-            #
-            # Your code here.
-            #
-            pass
+            for pid in self.peers:
+                self.peer(pid).unregister_peer(self.owner.id)
         finally:
             self.lock.release()
 
