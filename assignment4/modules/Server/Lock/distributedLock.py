@@ -110,6 +110,7 @@ class DistributedLock(object):
                 while self.state == NO_TOKEN:
                     time.sleep(0.01)
             else:
+                self.token[self.owner.id] = self.time
                 self.peer_list.lock.release()
 
             self.state = TOKEN_HELD
