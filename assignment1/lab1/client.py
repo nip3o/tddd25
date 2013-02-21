@@ -71,7 +71,6 @@ class DatabaseProxy(object):
             part = ''
             while True:
                 part = s.recv(4096)
-
                 if not part:
                     break
 
