@@ -97,10 +97,12 @@ class DistributedLock(object):
         print "Trying to acquire the lock..."
         self.peer_list.lock.acquire()
 
+        self.time += 1
+
         try:
             if self.state == NO_TOKEN:
-                for pid in self.peer_list.peers:
-                    self.peer_list.peer(pid).request_token(self.time, self.owner.id)
+                for pid, peer in self.peer_list.peers.iteritems():
+                    peer.request_token(self.time, self.owner.id)
 
                 self.peer_list.lock.release()
 
@@ -118,7 +120,7 @@ class DistributedLock(object):
                 self.state = NO_TOKEN
                 self.token[pid] = self.time
                 self.time += 1
-                self.peer_list.peer(pid).obtain_token(self.token)
+                self.peer_list.peers[pid].obtain_token(self.token)
                 return True
 
         for pid in [p for p in self.peer_list.peers if p > self.owner.id]:
