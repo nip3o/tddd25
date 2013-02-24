@@ -18,7 +18,7 @@ class DistributedReadWriteLock(ReadWriteLock):
     """Distributed version of ReadWriteLock."""
 
     def __init__(self, distributed_lock):
-        super(DistributedReadWriteLock).__init__(self)
+        super(DistributedReadWriteLock, self).__init__()
         # Create a distributed lock
         self.distributed_lock = distributed_lock
 
@@ -28,12 +28,12 @@ class DistributedReadWriteLock(ReadWriteLock):
         """ Override the write_acquire method to include obtaining access
             to the rest of the peers.
         """
-        super(DistributedReadWriteLock).write_acquire(self)
-        self.distributed_lock.aquire()
+        super(DistributedReadWriteLock, self).write_acquire()
+        self.distributed_lock.acquire()
 
     def write_release(self):
         """ Override the write_release method to include releasing access
             to the rest of the peers.
         """
-        self.distributed_lock.write_release()
-        super(DistributedReadWriteLock).release(self)
+        self.distributed_lock.release()
+        super(DistributedReadWriteLock, self).write_release()

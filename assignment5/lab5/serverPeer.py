@@ -104,16 +104,18 @@ class Server(orb.Peer):
     # Public methods
 
     def read(self):
-        #
-        # Your code here.
-        #
-        pass
+        self.drwlock.read_acquire()
+        fortune = self.db.read()
+        self.drwlock.read_release()
+        return fortune
 
     def write(self, fortune):
-        #
-        # Your code here.
-        #
-        pass
+        self.drwlock.write_acquire()
+
+        for peer in self.peer_list.peers.items():
+            peer.write(fortune)
+
+        self.drwlock.write_release()
 
     def write_no_lock(self, fortune):
         self.db.write(fortune)
