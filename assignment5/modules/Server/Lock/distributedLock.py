@@ -166,18 +166,11 @@ class DistributedLock(object):
         """Called when some other object is giving us the token."""
         print "Receiving the token..."
 
-        #self.peer_list.lock.acquire()
+        token = {int(k): v for k, v in token.iteritems()}
+        self.token = token
+        self.state = TOKEN_PRESENT
 
-        try:
-            token = {int(k): v for k, v in token.iteritems()}
-            self.token = token
-            self.state = TOKEN_PRESENT
-
-            self.time = token[self.owner.id] + 1
-
-        finally:
-            pass
-            #self.peer_list.lock.release()
+        self.time = token[self.owner.id] + 1
 
     def display_status(self):
         self.peer_list.lock.acquire()

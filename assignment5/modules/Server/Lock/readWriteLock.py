@@ -11,6 +11,7 @@
 
 import threading
 
+
 class ReadWriteLock(object):
     """ Reader-Writer lock.
 
@@ -34,14 +35,16 @@ class ReadWriteLock(object):
 
     def read_acquire(self):
         self.reader_lock.acquire()
-        if self.reader_count == 0: self.writer_lock.acquire()
+        if self.reader_count == 0:
+            self.writer_lock.acquire()
         self.reader_count = self.reader_count + 1
         self.reader_lock.release()
 
     def read_release(self):
         self.reader_lock.acquire()
         self.reader_count = self.reader_count - 1
-        if self.reader_count == 0: self.writer_lock.release()
+        if self.reader_count == 0:
+            self.writer_lock.release()
         self.reader_lock.release()
 
     def write_acquire(self):
